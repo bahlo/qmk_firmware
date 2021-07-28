@@ -4,7 +4,8 @@ enum custom_keycodes {
   AB_AE = SAFE_RANGE,
   AB_OE,
   AB_UE,
-  AB_EMOJI
+  AB_EMOJI,
+  AB_SCREENSHOT
 };
 
 enum layer_number {
@@ -79,7 +80,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     XXXXXXX, AB_UE,   XXXXXXX, AB_OE,   XXXXXXX, _______, \
   XXXXXXX, AB_AE,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX, \
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  XXXXXXX,  KC_LT,   KC_GT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
-                             _______, _______, _______,  _______, _______,  _______, _______, _______ \
+                             _______, _______, _______,  _______, _______,  _______, _______, AB_SCREENSHOT \
 ),
 /* ADJUST
  * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -207,6 +208,15 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       unregister_code(KC_LGUI);
       unregister_code(KC_LCTRL);
       unregister_code(KC_SPACE);
+      break;
+    case AB_SCREENSHOT:
+      // CMD + SHIFT + 4 = Screenshot
+      register_code(KC_LGUI);
+      register_code(KC_LSHIFT);
+      register_code(KC_4);
+      unregister_code(KC_LGUI);
+      unregister_code(KC_LSHIFT);
+      unregister_code(KC_4);
       break;
   }
   return true;
