@@ -4,7 +4,7 @@ enum custom_keycodes {
   AB_AE = SAFE_RANGE,
   AB_OE,
   AB_UE,
-  AB_SZ
+  AB_EMOJI
 };
 
 enum layer_number {
@@ -26,9 +26,9 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|   [   |    |    ]  |------+------+------+------+------+------|
  * |LShift|   Y  |   X  |   C  |   V  |   B  |-------|    |-------|   N  |   M  |   ,  |   .  |   /  |  =   |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
- *                   | LAlt | LGUI |LOWER | /Space  /       \Enter \  |RAISE |BackSP| RGUI |
- *                   |      |      |      |/       /         \      \ |      |      |      |
- *                   `----------------------------'           '------''--------------------'
+ *                   | LAlt | LGUI |LOWER | /Space  /       \Enter \  |RAISE |BackSP| EMOJI |
+ *                   |      |      |      |/       /         \      \ |      |      |       |
+ *                   `----------------------------'           '------''---------------------'
  */
 
  [_QWERTY] = LAYOUT( \
@@ -36,7 +36,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   KC_TAB,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                     KC_Z,    KC_U,    KC_I,    KC_O,    KC_P,    KC_MINS, \
   KC_LCTRL, KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                     KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT, \
   KC_LSFT,  KC_Y,   KC_X,    KC_C,    KC_V,    KC_B, KC_LBRC,  KC_RBRC,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,  KC_EQUAL, \
-                        KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC, KC_ENT, MO(_RAISE), KC_BSPC, KC_RGUI \
+                        KC_LALT, KC_LGUI, MO(_LOWER), KC_SPC, KC_ENT, MO(_RAISE), KC_BSPC, AB_EMOJI \
 ),
 /* LOWER
  * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -199,9 +199,14 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         tap_code(KC_U);
       }
       break;
-  case AB_SZ:
-      if (record->event.pressed) {
-      }
+    case AB_EMOJI:
+      // CMD + CTRL + Space = Emoji picker on macOS
+      register_code(KC_LGUI);
+      register_code(KC_LCTRL);
+      register_code(KC_SPACE);
+      unregister_code(KC_LGUI);
+      unregister_code(KC_LCTRL);
+      unregister_code(KC_SPACE);
       break;
   }
   return true;
