@@ -1,10 +1,7 @@
 #include QMK_KEYBOARD_H
 
 enum custom_keycodes {
-  AB_AE = SAFE_RANGE,
-  AB_OE,
-  AB_UE,
-  AB_EMOJI,
+  AB_EMOJI = SAFE_RANGE,
   AB_SCREENSHOT
 };
 
@@ -13,6 +10,28 @@ enum layer_number {
   _LOWER,
   _RAISE,
   _ADJUST,
+};
+
+enum unicode_names {
+  AE,
+  AE_UPPER,
+  OE,
+  OE_UPPER,
+  UE,
+  UE_UPPER,
+  SZ,
+  SZ_UPPER,
+};
+
+const uint32_t PROGMEM unicode_map[] = {
+  [AE] = 0x00E4,  // ä
+  [AE_UPPER] = 0x00C4,  // Ä
+  [OE] = 0x00F6,  // ö
+  [OE_UPPER] = 0x00D6,  // Ö
+  [UE] = 0x00FC,  // ü
+  [UE_UPPER] = 0x00DC,  // Ü
+  [SZ]  = 0x00DF,  // ß
+  [SZ_UPPER] = 0x1E9E,  // ẞ
 };
 
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -77,8 +96,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 [_RAISE] = LAYOUT( \
   _______, _______, _______, _______, _______, _______,                     _______, _______, _______, _______, _______, _______, \
-  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     XXXXXXX, AB_UE,   XXXXXXX, AB_OE,   XXXXXXX, _______, \
-  XXXXXXX, AB_AE,   XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX, \
+  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,                     XXXXXXX, XP(UE, UE_UPPER),   XXXXXXX, XP(OE, OE_UPPER),   XXXXXXX, _______, \
+  XXXXXXX, XP(AE, AE_UPPER), XP(SZ, SZ_UPPER), XXXXXXX, XXXXXXX, XXXXXXX,                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, XXXXXXX, XXXXXXX, \
   _______, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX,  XXXXXXX,  KC_LT,   KC_GT,  XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, XXXXXXX, \
                              _______, _______, _______,  _______, _______,  _______, _______, AB_SCREENSHOT \
 ),
@@ -145,7 +164,6 @@ void oled_task_user(void) {
 }
 #endif // OLED_DRIVER_ENABLE
 
-bool lshift_pressed = false;
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
 #ifdef OLED_DRIVER_ENABLE
@@ -155,69 +173,24 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   }
 
   switch (keycode) {
-  case KC_LSHIFT:
-    lshift_pressed = record->event.pressed;
+  case AB_EMOJI:
+    // CMD + CTRL + Space = Emoji picker on macOS
+    register_code(KC_LGUI);
+    register_code(KC_LCTRL);
+    register_code(KC_SPACE);
+    unregister_code(KC_LGUI);
+    unregister_code(KC_LCTRL);
+    unregister_code(KC_SPACE);
     break;
-  case AB_AE:
-      if (record->event.pressed) {
-        if (lshift_pressed) {
-          unregister_code(KC_LSHIFT);
-        }
-        register_code(KC_LOPT);
-        tap_code(KC_U);
-        unregister_code(KC_LOPT);
-        if (lshift_pressed) {
-          register_code(KC_LSHIFT);
-        }
-        tap_code(KC_A);
-      }
-      break;
-  case AB_OE:
-      if (record->event.pressed) {
-        if (lshift_pressed) {
-          unregister_code(KC_LSHIFT);
-        }
-        register_code(KC_LOPT);
-        tap_code(KC_U);
-        unregister_code(KC_LOPT);
-        if (lshift_pressed) {
-          register_code(KC_LSHIFT);
-        }
-        tap_code(KC_O);
-      }
-      break;
-  case AB_UE:
-      if (record->event.pressed) {
-        if (lshift_pressed) {
-          unregister_code(KC_LSHIFT);
-        }
-        register_code(KC_LOPT);
-        tap_code(KC_U);
-        unregister_code(KC_LOPT);
-        if (lshift_pressed) {
-          register_code(KC_LSHIFT);
-        }
-        tap_code(KC_U);
-      }
-      break;
-    case AB_EMOJI:
-      // CMD + CTRL + Space = Emoji picker on macOS
-      register_code(KC_LGUI);
-      register_code(KC_LCTRL);
-      register_code(KC_SPACE);
-      unregister_code(KC_LGUI);
-      unregister_code(KC_LCTRL);
-      unregister_code(KC_SPACE);
-      break;
-    case AB_SCREENSHOT:
-      // CMD + SHIFT + 4 = Screenshot
-      register_code(KC_LGUI);
-      register_code(KC_LSHIFT);
-      register_code(KC_4);
-      unregister_code(KC_LGUI);
-      unregister_code(KC_LSHIFT);
-      unregister_code(KC_4);
-      break;
+  case AB_SCREENSHOT:
+    // CMD + SHIFT + 4 = Screenshot
+    register_code(KC_LGUI);
+    register_code(KC_LSHIFT);
+    register_code(KC_4);
+    unregister_code(KC_LGUI);
+    unregister_code(KC_LSHIFT);
+    unregister_code(KC_4);
+    break;
   }
   return true;
 }
